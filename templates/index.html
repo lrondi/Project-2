@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Deep Sea Corals</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <style>
       /* Set the size of the div element that contains the map */
      #map {
@@ -36,8 +36,14 @@
         position:relative;
         z-index:2;
       }
+      
+      .container{
+        margin-top: 20px;
+        margin-bottom: 50px
+      }
 
    </style>
+   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 
 <body>
@@ -54,73 +60,61 @@
           </div>
       </div>
   </div>
-  <!-- <div class='container'>
+
+  <div class='container'>
     <div class='row'>
-      <div class="col-md-12 jumbotron jumbotron-billboard text-center">
-          <div class="img"></div>
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                      <h1 class='display-2'>Dive in!</h1>
-                      <h2 class='display-4'>Deep Sea Corals Database Exploration</h2>
-                        
-                    </div>
+      <div class='col m-2'>
+
+        <div class="row">
+            <div class="card bg-light mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">Select species:</h5>
+                  <p class="card-text">Species that you want to locate on the map</p>
+                  <select id="selDataset" onchange="optionChanged(this.value)"></select>
                 </div>
             </div>
-        </div> -->
-    <div class='container'>
-    <div class='col-md-4'>
-
-    <div class="row">
-    
-        <div class="well">
-          <h5>SELECT Species:</h5>
-          <select id="selDataset" onchange="optionChanged(this.value)"></select>
         </div>
       
-    </div>
-    
-    <div class='row'>  
-      
-        <div class="well">
-          <h5>SELECT Taxa level:</h5>
-          <select id="selTaxa" onchange="optionChanged2(this.value)"></select>
+        <div class='row'> 
+            <div class="card bg-light mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">Select taxa rank:</h5>
+                  <p class="card-text">Shared taxonomy rank of other species</p>
+                  <select id="selTaxa" onchange="optionChanged2(this.value)"></select>
+                </div>
+            </div> 
         </div>
-      
-    </div>
 
-    <div class='row'>
-      
-        <div class='well'>
-          <h5 id='paragraph'></h5>
+        <div class='row'>
+            <div class="card bg-light mb-3">
+                <div class="card-body">
+                  <h5 id='paragraph'></h5>
+                </div>
+            </div> 
         </div>
-      
-    </div>
-  </div>
-
-  <div class='col-md-7 col-md-offset-1'>
-    <div class='row'>
-      <!-- <div class="col-md-8"> -->
-          <h3>Geographic location</h3>
-          <!--The div element for the map -->
-          <div id="map"></div>
-          <script async defer src="https://maps.googleapis.com/maps/api/js?key=""&libraries=visualization"></script>
-          
-      <!-- </div> -->
-      <!-- <div id="pie"></div>
       </div>
-      <div class="col-md-5">
-        <div id="gauge"></div>
-      </div> -->
+
+      <div class='col-8 m-2'> 
+        <div class='row'>
+          <h3>Geographic location</h3>
+          <div id="map"></div>
+          <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBejMXp63dhTDOZGR2c53lDM1CMW5jT7R4&libraries=visualization"></script>
+        </div>
+      </div>
     </div>
   </div>
-  </div>
+
+</div class='container'>
+    <div class='row justify-content-center'>
+      <h3 id='title'>Average depth of corals by common category</h3>
+    </div>
 </div>
-  <!-- <div class="row">
-    <div class="col-md-12">
-      <div id="bubble"></div>
-    </div>
-  </div> -->
+<div class='container'>
+    <div id="plot"></div>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.js"></script>
+      <script src="{{ url_for('static', filename='js/plots.js') }}"></script> 
+</div>
 
   <script src="https://cdn.plot.ly/plotly-1.31.2.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.js"></script>

@@ -17,9 +17,17 @@ var svg = d3
   .attr("width", svgWidth)
   .attr("height", svgHeight);
 
+svg.append("rect")
+  .attr("width", "100%")
+  .attr("height", "100%")
+  .attr("fill", "blue");
+
+svg.append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var chartGroup = svg.append("g")
-  .attr("transform", `translate(${margin.left}, ${margin.top})`);
+  .attr("transform", `translate(${margin.left}, ${margin.top})`)
+  .attr('class', "plot-svg");
 
 // Initial Params
 var chosenYAxis = 'twilight';
@@ -29,7 +37,7 @@ function yScale(data, chosenYAxis){
   var yLinearScale = d3.scaleLinear()
     .domain([d3.min(data[chosenYAxis], d => d.avg_depth),
       d3.max(data[chosenYAxis],d => d.avg_depth) *1.2])
-      .range([height,0]);
+      .range([0,height]);
 
   return yLinearScale;
 }
@@ -111,7 +119,7 @@ function init(){
 d3.json('/vernacular').then((data)=>{
 
     var xLinearScale =d3.scaleLinear().domain([d3.min(data[chosenYAxis], d =>d.cat_num)*0.3, 
-                      d3.max(data[chosenYAxis], d=>d.cat_num)*1.2]).range([0, width]);
+                      d3.max(data[chosenYAxis], d=>d.cat_num)]).range([0, width]);
     var yLinearScale = yScale(data, chosenYAxis);
     var dd = data['twilight']
     // console.log(dd)
