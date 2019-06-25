@@ -84,7 +84,8 @@ def get_taxa(taxa, sp):
 
 @app.route('/vernacular')
 def vernacular_data():
-    tw= db.session.query(Species.VernacularNameCategory, func.count(Species.index), func.avg(Species.DepthInMeters)).filter(Species.DepthInMeters<1000).group_by(Species.VernacularNameCategory)
+    sl = db.session.query(Species.VernacularNameCategory, func.count(Species.index), func.avg(Species.DepthInMeters)).filter(Species.DepthInMeters<200).group_by(Species.VernacularNameCategory)
+    tw= db.session.query(Species.VernacularNameCategory, func.count(Species.index), func.avg(Species.DepthInMeters)).filter(Species.DepthInMeters>200).filter(Species.DepthInMeters<1000).group_by(Species.VernacularNameCategory)
     mid = db.session.query(Species.VernacularNameCategory, func.count(Species.index), func.avg(Species.DepthInMeters)).filter(Species.DepthInMeters>1000).filter(Species.DepthInMeters<4000).group_by(Species.VernacularNameCategory)
     abyss = db.session.query(Species.VernacularNameCategory, func.count(Species.index), func.avg(Species.DepthInMeters)).filter(Species.DepthInMeters>4000).group_by(Species.VernacularNameCategory)
     ver_names = db.session.query(Species.VernacularNameCategory).group_by(Species.VernacularNameCategory)
@@ -95,8 +96,25 @@ def vernacular_data():
         ver_dict[v[0]]=i
         i=i+1
 
-    final_dict = {'twilight':{}, 'midnight':{}, 'abyss':{}}
+    final_dict = {'sunlight':{},'twilight':{}, 'midnight':{}, 'abyss':{}}
     
+    temp_dict_arr = []
+    for row in sl:
+        temp_dict = {}
+        temp_dict['category'] = row[0]
+        temp_dict['cat_num'] = ver_dict[row[0]]
+        temp_dict['avg_depth'] = row[2]
+        temp_dict['count'] = row[1]
+        temp_dict_arr.append(temp_dict)
+    
+    a = list(set(range(1,18)) - set([i['cat_num'] for i in temp_dict_arr]))
+    for i in a:
+        cat_a = (list(ver_dict.keys())[list(ver_dict.values()).index(i)])
+        tt_d = {'category': cat_a, 'cat_num':i, 'avg_depth':0,'count':0}
+        temp_dict_arr.append(tt_d)
+    temp_dict_arr = sorted(temp_dict_arr, key = lambda i: i['cat_num'])
+    final_dict['sunlight'] = temp_dict_arr
+
     temp_dict_arr = []
     for row in tw:
         temp_dict = {}

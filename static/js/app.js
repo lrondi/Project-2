@@ -1,19 +1,3 @@
-// function buildMetadata(sample) {
-//   var URL =  '/metadata/'+sample;
-  
-//   d3.json(URL).then(function(data){
-//     var panel = d3.select('#sample-metadata');  
-//     panel.html('');
-//     Object.entries(data).forEach(([key,value]) => {
-//       var par = panel.append('p');
-//       par.text(`${key}: ${value}`);
-//     });
-//   });
-
-//     // BONUS: Build the Gauge Chart
-//     // buildGauge(data.WFREQ)    
-// };
-
 
 function createMap (species_name, taxa_level){
   d3.json('/species/'+ species_name).then((data) =>{
@@ -98,7 +82,7 @@ function createMap (species_name, taxa_level){
     };
     
     var map = new google.maps.Map(
-      document.getElementById('map'), {zoom: 3, center: coord[0], mapTypeId: 'satellite'});
+      document.getElementById('map'), {zoom: 2, center: coord[0], mapTypeId: 'satellite'});
 
     for (var i =0; i< long_list.length; i++){
       var sContent =
@@ -130,17 +114,18 @@ function createMap (species_name, taxa_level){
         var b = data.longitude[i]
         heat_coord.push(new google.maps.LatLng(v,b))
       }
+      console.log(heat_coord)
 
       var heatmap = new google.maps.visualization.HeatmapLayer({
-        data: heat_coord
+        data: heat_coord, maxIntensity:100
       });
       heatmap.setMap(map);
 
       var paragraph = d3.select('#paragraph');  
       paragraph.html('');
       paragraph.html(
-        `<h4>The marker shows all the locations of <em>${species_name}</em>, and the heatmap shows all the locations of species that share
-         the same ${taxa_level}, in this case, ${data.taxa_value}</h4>`); 
+        `<p>The marker shows all the locations of <em>${species_name}</em>, and the heatmap shows all the locations of species that share
+         the same ${taxa_level}, in this case, ${data.taxa_value}</p>`); 
     });
   });
   

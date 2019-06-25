@@ -1,0 +1,58 @@
+.xaxis line{
+    stroke:rgb(77, 69, 69);
+}
+
+.xaxis path{
+    stroke:rgb(77, 69, 69);
+}
+
+.x-text{
+    fill:rgb(172, 165, 165);
+}
+
+.yaxis line{
+    stroke:rgb(77, 69, 69);
+}
+
+.yaxis path{
+    stroke:rgb(77, 69, 69);
+}
+
+.yaxis text{
+    fill:rgb(172, 165, 165);
+}
+
+.label text{
+    fill:rgb(172, 165, 165)
+}
+
+.tooltip {
+    padding: 6px;
+    font-size: 12px;
+    line-height: 1;
+    line-height: 1.5em;
+    color: #fff;
+    text-align: center;
+    text-transform: capitalize;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 4px;
+}
+
+.active {
+    font-weight: bold;
+    transition: fill 0.3s ease-out;
+    text-anchor: middle;
+}
+
+.inactive {
+    font-weight: lighter;
+    fill: #c9c9c9;
+    transition: fill 0.3s ease-out;
+    text-anchor: middle;
+}
+
+.inactive:hover {
+    fill: #000;
+    cursor: pointer;
+}
+
