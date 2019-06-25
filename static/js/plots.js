@@ -17,10 +17,10 @@ var svg = d3
   .attr("width", svgWidth)
   .attr("height", svgHeight);
 
-svg.append("rect")
+var rect = svg.append("rect")
   .attr("width", "100%")
   .attr("height", "100%")
-  .attr("fill", "blue");
+  .attr("fill", "#2C47F2");
 
 svg.append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -121,15 +121,14 @@ d3.json('/vernacular').then((data)=>{
     var xLinearScale =d3.scaleLinear().domain([d3.min(data[chosenYAxis], d =>d.cat_num)*0.3, 
                       d3.max(data[chosenYAxis], d=>d.cat_num)]).range([0, width]);
     var yLinearScale = yScale(data, chosenYAxis);
+    
     var dd = data['twilight']
-    // console.log(dd)
     var tickLabels = []
-
     for (var i=0;i<dd.length;i++){
       var b = dd[i];
-      console.log(b)
       tickLabels.push(b['category'])
     }
+
     var bottomAxis = d3.axisBottom(xLinearScale);
     bottomAxis.tickValues(new Array(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17));
     bottomAxis.tickFormat(function(d,i){ return tickLabels[i] }); 
@@ -139,18 +138,19 @@ d3.json('/vernacular').then((data)=>{
       .classed("x-axis", true)
       .attr("transform", `translate(0, ${height})`)
       .call(bottomAxis)
+      .attr('class','yaxis')
       .selectAll("text")  
       .style("text-anchor", "end")
       .attr("dx", "-.8em")
       .attr("dy", ".15em")
-      .attr("transform", "rotate(-35)" );;
-  
+      .attr("transform", "rotate(-35)" ); 
  
 
   // append y axis
   var yAxis = chartGroup.append("g")
     .classed('y-axis', true)
     .call(leftAxis);
+    // .attr('class','yaxis');
 
 
   // append initial circles
@@ -222,6 +222,7 @@ d3.json('/vernacular').then((data)=>{
       console.log(value)
       if (value !== chosenYAxis){
         chosenYAxis = value;
+        yAxis.attr('class', 'yaxis')
         // if (chosenYAxis ==='midnight'){chosenRadius = 'mid_count'}
         // else if (chosenYAxis === 'abyss'){chosenRadius = 'ab_count'}
         // else (chosenRadius = 'twil_count')
@@ -234,6 +235,7 @@ d3.json('/vernacular').then((data)=>{
         // circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
         if (chosenYAxis === "twilight") {
+          rect.attr('fill','#2C47F2')
           twilightLabel
             .classed("active", true)
             .classed("inactive", false);
@@ -245,6 +247,7 @@ d3.json('/vernacular').then((data)=>{
             .classed('inactive', true);
         }
         else if (chosenYAxis ==='midnight'){
+          rect.attr('fill','#2331BB');
           twilightLabel
             .classed("active", false)
             .classed("inactive", true);
@@ -256,6 +259,7 @@ d3.json('/vernacular').then((data)=>{
             .classed('inactive', true);
         }
         else {
+          rect.attr('fill','#1A1F84')
           twilightLabel
             .classed("active", false)
             .classed("inactive", true);
