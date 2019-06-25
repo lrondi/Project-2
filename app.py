@@ -53,7 +53,6 @@ def species(sp):
 
     species_data = df.loc[df['index']==sp,['latitude','longitude', 'DepthInMeters','Locality','VernacularNameCategory']]
     vernac = species_data.iloc[0,4]
-    print(vernac)
     data = {
         "species": sp,
         "latitude": species_data['latitude'].tolist(),
@@ -88,25 +87,69 @@ def vernacular_data():
     tw= db.session.query(Species.VernacularNameCategory, func.count(Species.index), func.avg(Species.DepthInMeters)).filter(Species.DepthInMeters<1000).group_by(Species.VernacularNameCategory)
     mid = db.session.query(Species.VernacularNameCategory, func.count(Species.index), func.avg(Species.DepthInMeters)).filter(Species.DepthInMeters>1000).filter(Species.DepthInMeters<4000).group_by(Species.VernacularNameCategory)
     abyss = db.session.query(Species.VernacularNameCategory, func.count(Species.index), func.avg(Species.DepthInMeters)).filter(Species.DepthInMeters>4000).group_by(Species.VernacularNameCategory)
-    
-    twil_depth ={}
-    for row in tw:
-        twil_depth[row[0]]={'count': row[1], 'avg_depth':row[2]}
+    ver_names = db.session.query(Species.VernacularNameCategory).group_by(Species.VernacularNameCategory)
 
+    ver_dict = {}
+    i=1
+    for v in ver_names:
+        ver_dict[v[0]]=i
+        i=i+1
+
+    final_dict = {'twilight':{}, 'midnight':{}, 'abyss':{}}
     
-    mid_depth = {}
+    temp_dict_arr = []
+    for row in tw:
+        temp_dict = {}
+        temp_dict['category'] = row[0]
+        temp_dict['cat_num'] = ver_dict[row[0]]
+        temp_dict['avg_depth'] = row[2]
+        temp_dict['count'] = row[1]
+        temp_dict_arr.append(temp_dict)
+    
+    a = list(set(range(1,18)) - set([i['cat_num'] for i in temp_dict_arr]))
+    for i in a:
+        cat_a = (list(ver_dict.keys())[list(ver_dict.values()).index(i)])
+        tt_d = {'category': cat_a, 'cat_num':i, 'avg_depth':0,'count':0}
+        temp_dict_arr.append(tt_d)
+    temp_dict_arr = sorted(temp_dict_arr, key = lambda i: i['cat_num'])
+    final_dict['twilight'] = temp_dict_arr
+
+    temp_dict_arr = []
     for row in mid:
-        mid_depth[row[0]]={'count': row[1], 'avg_depth':row[2]}
-    
-    abyss_depth = {}
+        temp_dict = {}
+        temp_dict['category'] = row[0]
+        temp_dict['cat_num'] = ver_dict[row[0]]
+        temp_dict['avg_depth'] = row[2]
+        temp_dict['count'] = row[1]
+        temp_dict_arr.append(temp_dict)
+
+    a = list(set(range(1,18)) - set([i['cat_num'] for i in temp_dict_arr]))
+    for i in a:
+        cat_a = (list(ver_dict.keys())[list(ver_dict.values()).index(i)])
+        tt_d = {'category': cat_a, 'cat_num':i, 'avg_depth':0,'count':0}
+        temp_dict_arr.append(tt_d)
+    temp_dict_arr = sorted(temp_dict_arr, key = lambda i: i['cat_num'])
+    final_dict['midnight'] = temp_dict_arr
+
+    temp_dict_arr = []
     for row in abyss:
-        abyss_depth[row[0]]={'count': row[1], 'avg_depth':row[2]}
+        temp_dict = {}
+        temp_dict['category'] = row[0]
+        temp_dict['cat_num'] = ver_dict[row[0]]
+        temp_dict['avg_depth'] = row[2]
+        temp_dict['count'] = row[1]
+        temp_dict_arr.append(temp_dict)
     
-    depth_data={'twilight':twil_depth,'midnight': mid_depth,'abyss': abyss_depth}
-    
-    print(depth_data)
-    json_depth = json.dumps(depth_data)
-    return json_depth
+    a = list(set(range(1,18)) - set([i['cat_num'] for i in temp_dict_arr]))
+    for i in a:
+        cat_a = (list(ver_dict.keys())[list(ver_dict.values()).index(i)])
+        tt_d = {'category': cat_a, 'cat_num':i, 'avg_depth':0,'count':0}
+        temp_dict_arr.append(tt_d)
+    temp_dict_arr = sorted(temp_dict_arr, key = lambda i: i['cat_num'])
+    final_dict['abyss'] = temp_dict_arr
+
+
+    return jsonify(final_dict)
 
 
 if __name__ == "__main__":
