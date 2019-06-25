@@ -20,7 +20,7 @@ var svg = d3
 var rect = svg.append("rect")
   .attr("width", "100%")
   .attr("height", "100%")
-  .attr("fill", "#2C47F2");
+  .attr("fill", "#131B67");
 
 svg.append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -62,44 +62,40 @@ function renderCircles(circlesGroup, dat, newXScale, newYScale, chosenYAxis) {
     .duration(1000)
     .attr('cx', d => newXScale(d.cat_num))
     .attr('cy', d => newYScale(d.avg_depth))
-    .attr('r',d => Math.log2(1+d.count));
+    .attr('r',d => Math.log2(1+d.count*10));
     // d => d[chosenYAxis].count
   return circlesGroup;
 }
 
-// // function used for updating state text group with a transition to new text 
-// function renderText (textGroup, newXScale, newYScale, chosenXAxis, chosenYAxis){
-//   textGroup.transition()
-//   .duration(1000)
-//   .attr('x', d => newXScale(d[chosenXAxis]))
-//   .attr('y', d => newYScale(d[chosenYAxis]-0.5));
+function updateToolTip(chosenYAxis, circlesGroup) {
 
-//   return textGroup;
-// }
+  var label = 'Number of species: '
+  var toolTip = d3.tip()
+    .attr("class", "tooltip")
+    .offset([60, -60])
+    .html(function(d) {
+      return (`${label}${d.count}`);
+    });
 
-// function used for updating circles group with new tooltip
-// function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
+  circlesGroup.call(toolTip);
+  
+  circlesGroup.on("mouseover", function(data) {
+    toolTip.show(data, this);
+  })
+    // onmouseout event
+    .on("mouseout", function(data, index) {
+      toolTip.hide(data, this);
+    });
 
-//   if (chosenXAxis === "poverty") {
-//     var xlabel = "% in poverty: ";
-//   }
-//   else {
-//     var xlabel = "Age (median): ";
-//   };
+  return circlesGroup;
+}
 
-//   if (chosenYAxis === 'smokes'){
-//     var ylabel = '% of smokers: '
-//   }
-//   else{
-//     var ylabel = '% without healthcare: '
-//   };
+//   var label_text = 'Total number of species: '
 
 //   var toolTip = d3.tip()
 //     .attr("class", "tooltip")
 //     .offset([60, -60])
-//     .html(function(d) {
-//       return (`<b>${d.state}</b><br>${xlabel}${d[chosenXAxis]}<br>${ylabel}${d[chosenYAxis]}`);
-//     });
+//     .html(`${label_text} 4000`);
 
 //   circlesGroup.call(toolTip);
   
@@ -132,25 +128,28 @@ d3.json('/vernacular').then((data)=>{
     var bottomAxis = d3.axisBottom(xLinearScale);
     bottomAxis.tickValues(new Array(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17));
     bottomAxis.tickFormat(function(d,i){ return tickLabels[i] }); 
+    
     var leftAxis = d3.axisLeft(yLinearScale);
     // append x axis
     var xAxis = chartGroup.append("g")
       .classed("x-axis", true)
       .attr("transform", `translate(0, ${height})`)
       .call(bottomAxis)
-      .attr('class','yaxis')
+      .attr('class','xaxis')
       .selectAll("text")  
       .style("text-anchor", "end")
+      .style('color','white')
       .attr("dx", "-.8em")
       .attr("dy", ".15em")
-      .attr("transform", "rotate(-35)" ); 
+      .attr("transform", "rotate(-35)" )
+      .attr('class', 'x-text'); 
  
 
   // append y axis
   var yAxis = chartGroup.append("g")
     .classed('y-axis', true)
-    .call(leftAxis);
-    // .attr('class','yaxis');
+    .call(leftAxis)
+    .attr('class','yaxis');
 
 
   // append initial circles
@@ -160,34 +159,16 @@ d3.json('/vernacular').then((data)=>{
     .append("circle")
     .attr("cx", d => xLinearScale(d.cat_num))
     .attr("cy", d => yLinearScale(d.avg_depth))
-    .attr("r", d => Math.log2(1+d.count))
-    .style('fill', "#69b3a2");;
-    // .attr('class', 'stateCircle');
-  
-//   // append initial state text
-//   var textGroup = chartGroup.append("text")
-//     .selectAll("tspan")
-//     .data(healthData)
-//     .enter()
-//     .append("tspan")
-//     .attr("x", function(d) {
-//             return xLinearScale(d[chosenXAxis]);
-//         })
-//     .attr("y", function(d) {
-//             return yLinearScale(d[chosenYAxis] - 0.5);
-//         })
-//     .text(function(d) {
-//             return d.abbr;
-//         })
-//     .attr('class', 'stateText');
-
+    .attr("r", d => Math.log2(1+d.count*10))
+    .style('fill', "#43E5D7"); 
 
   // Create group for  2 y- axis labels  
   var ylabelsGroup = chartGroup. append('g')
     .attr('transform', 'rotate(-90)')
+    .attr('class', 'label')
 
     var twilightLabel = ylabelsGroup.append('text')
-        .attr('x', 0 - (2*height/3))
+        .attr('x', 0 - (height/2))
         .attr('y', 0 - margin.left+60)
         .attr('value', 'twilight')
         .attr('dy', '1em')
@@ -195,7 +176,7 @@ d3.json('/vernacular').then((data)=>{
         .text('Twilight zone (2-1000m)')
     
     var midnightLabel = ylabelsGroup.append('text')
-        .attr('x', 0 - (2*height/3))
+        .attr('x', 0 - (height/2))
         .attr('y', 0 - margin.left + 40)
         .attr('value', 'midnight')
         .attr('dy', '1em')
@@ -203,15 +184,15 @@ d3.json('/vernacular').then((data)=>{
         .text('Midnight zone (1000-4000m)')
     
     var abyssLabel = ylabelsGroup.append('text')
-    .attr('x', 0 - (2*height/3))
-    .attr('y', 0 - margin.left+20)
-    .attr('value', 'abyss')
-    .attr('dy', '1em')
-    .classed('inactive', true)
-    .text('The abyss zone (>4000m)')    
+        .attr('x', 0 - (height/2))
+        .attr('y', 0 - margin.left+20)
+        .attr('value', 'abyss')
+        .attr('dy', '1em')
+        .classed('inactive', true)
+        .text('The abyss zone (>4000m)')    
       
   // updateToolTip function above csv import
-//   var circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
+  var circlesGroup = updateToolTip(chosenYAxis, circlesGroup);
 
   
   // y axis labels event listener
@@ -232,10 +213,10 @@ d3.json('/vernacular').then((data)=>{
         
         circlesGroup = renderCircles(circlesGroup, data, xLinearScale, yLinearScale, chosenYAxis);
         // textGroup = renderText(textGroup, xLinearScale, yLinearScale, chosenXAxis, chosenYAxis);
-        // circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
+        circlesGroup = updateToolTip(data, chosenYAxis, circlesGroup);
 
         if (chosenYAxis === "twilight") {
-          rect.attr('fill','#2C47F2')
+          rect.attr('fill','#131B67')
           twilightLabel
             .classed("active", true)
             .classed("inactive", false);
@@ -247,7 +228,7 @@ d3.json('/vernacular').then((data)=>{
             .classed('inactive', true);
         }
         else if (chosenYAxis ==='midnight'){
-          rect.attr('fill','#2331BB');
+          rect.attr('fill','#0F1A6E');
           twilightLabel
             .classed("active", false)
             .classed("inactive", true);
@@ -259,7 +240,7 @@ d3.json('/vernacular').then((data)=>{
             .classed('inactive', true);
         }
         else {
-          rect.attr('fill','#1A1F84')
+          rect.attr('fill','#050E43')
           twilightLabel
             .classed("active", false)
             .classed("inactive", true);
