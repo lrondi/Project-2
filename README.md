@@ -2,7 +2,7 @@
 
 On this project I wanted to create a website to visualize the data from the Deep Sea Corals database and the map visualizations that I worked with on the ETL project (https://github.com/lrondi/ETL-project).
 
-The first part consistend on creating the interactive map in which every species location in the database can be visualize as markers (one species at a time), and at the same time be able to see the location of every species that shares a given taxonomic rank with the selected species.
+The first part consisted on creating the interactive map in which every species location in the database can be visualize as markers (one species at a time), and at the same time be able to see the location of every species that shares a given taxonomic rank with the selected species.
 
 In order to do this, I created two dropdown menues to select the species and the level of taxonomic rank to compare locations, and a descriptive box with the information.
 
