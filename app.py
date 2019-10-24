@@ -75,7 +75,7 @@ def species(sp):
 
 
 @app.route('/<taxa>/<sp>')
-def get_taxa2(taxa, sp):
+def get_taxa(taxa, sp):
 
     # Get taxonomic info for given sp at given taxa level -- ie: look up 'Family' for sp 'Aaptos aaptos', results = Suberitidae
     tx = "'"+ taxa + "'"
