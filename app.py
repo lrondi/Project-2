@@ -46,41 +46,62 @@ def names():
     return jsonify(species_list)
 
 
-@app.route("/species/<sp>")
+@app.route('/species/<sp>')
 def species(sp):
-    stmt = db.session.query(Species).statement
-    df = pd.read_sql_query(stmt, db.session.bind)
+    species_data = db.session.query(Species.latitude, Species.longitude, Species.Locality, Species.DepthInMeters, Species.VernacularNameCategory).filter(Species.index == sp)
+    
+    lat_list = []
+    long_list = []
+    loc_list = []
+    dep_list = []
 
-    species_data = df.loc[df['index']==sp,['latitude','longitude', 'DepthInMeters','Locality','VernacularNameCategory']]
-    vernac = species_data.iloc[0,4]
+    for row in species_data:
+        lat_list.append(row[0])
+        long_list.append(row[1])
+        loc_list.append(row[2])
+        dep_list.append(row[3]) 
+        vernac = row[4]
+    
     data = {
-        "species": sp,
-        "latitude": species_data['latitude'].tolist(),
-        "longitude": species_data['longitude'].tolist(),
-        'locality': species_data['Locality'].tolist(),
-        "depth": species_data['DepthInMeters'].tolist(),
+        'species': sp,
+        'latitude': lat_list,
+        'longitude': long_list,
+        'locality': loc_list,
+        'depth': dep_list,
         'vernac': vernac
     }
+
     return jsonify(data)
 
-@app.route('/<taxa>/<sp>')
-def get_taxa(taxa, sp):
 
+@app.route('/<taxa>/<sp>')
+def get_taxa2(taxa, sp):
+
+    # Get taxonomic info for given sp at given taxa level -- ie: look up 'Family' for sp 'Aaptos aaptos', results = Suberitidae
     tx = "'"+ taxa + "'"
 
     sel = ['Species.'+tx]
     sp_taxa = db.session.query(*sel).filter(Species.index == sp).first()[0]
     
-    stmt = f"SELECT * FROM species WHERE `{taxa}` = '{sp_taxa}'"
-    df = pd.read_sql_query(stmt, db.session.bind)
+    # Get coordinates of all other sp that share same taxonomic level
+    sel2 = ['Species.'+ tx +'=='+ "'"+ sp_taxa + "'"]
+    taxa_data = db.session.query(Species.latitude, Species.longitude).filter(*sel2)
+
+    lat_list = []
+    long_list = []
+
+    for row in taxa_data:
+        lat_list.append(row[0])
+        long_list.append(row[1])
+
     data ={
-        'latitude': df['latitude'].tolist(),
-        'longitude': df['longitude'].tolist(),
+        'latitude': lat_list,
+        'longitude': long_list,
         'taxa_rank': taxa,
         'taxa_value': sp_taxa
     }
 
-    return jsonify(data)
+    return jsonify(data)   
 
 @app.route('/vernacular')
 def vernacular_data():
